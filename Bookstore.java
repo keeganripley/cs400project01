@@ -6,61 +6,85 @@
 // TA: Keren
 // Lecturer: Florian
 // Notes to Grader: <optional extra notes>
-public class Bookstore<KeyType, ValueType> {
-	private int isbn; // ISBN number but without first 3 numbers (978); therefore only stores last 10
-	// digits of ISBN # (starts with 1 or 0)
-	private String title; // book title
-	private String genre; // genre of book
-	private int quantity; // number of books currently available
+public class BookStore extends BookCollection {
 
-	// KeyIsbn is last 10 digits of ISBN of book
-	// ValueBook is a book object that has 5 parameters:
-	// isbn, title, price, genre, quantity
-	// To retrieve, get method for desired stored value
-	HashTableMap<Integer, Book> bookstore = new HashTableMap<Integer, Book>(20);
+	HashTableMap<Integer, Book> store; // Creates an instance of HashTableMap to represent the book store.
+	private int count; // Stores the number of books in the book store, NOT the number of elements in
+						// the hash table.
 
-	// put() method alteration
-	// if key exists, then quantity++
-	// if key doesn't exists, put book into hash table
-	public void put(Integer key, Book newBook) {
-		// set global variables to equal the information of the parameter book
-		isbn = newBook.getIsbn();
-		title = newBook.getTitle();
-		genre = newBook.getGenre();
-		quantity = newBook.getQuantity();
-		// Create new book that has information held in global variables
-		Book book = new Book(isbn, title, genre, quantity);
-		// If ISBN exists, add one to the quantity.
-		if (bookstore.containsKey(key)) {
-			book.setQuantity(quantity++);
-		// Otherwise add a new book at the index of the hashed ISBN.
+	// Constructor which creates the stores hash table and adds initial books to the
+	// store.
+	public BookStore(int capacity) {
+		super(20);
+
+		// Obtain initial books for the book store before user adds or removes books.
+		Book[] books = getInitialBooks();
+		// Initialize the store using global field with size 20 which is how many books
+		// our store can hold.
+		store = new HashTableMap<Integer, Book>(20);
+		for (Book b : books) {
+			store.put(b.getIsbn(), b);
+			count++;
+		}
+
+	}
+
+	// Check to see if a book exists in the store hash table.
+	public boolean containsBook(int isbn) {
+
+		if (store.containsKey(isbn)) {
+			return true;
 		} else {
-		bookstore.put(isbn, book);
+			return false;
 		}
 	}
 
-	// remove() method alteration
-	// quantity--
-	// if quantity == 0, remove book
-	public void remove(Integer isbn) {
-		// If quantity = 0 then remove the book.
-		if (bookstore.get(isbn).getQuantity() == 0) {
-			bookstore.remove(isbn);
-		// Find book at index, decrease quantity by 1
-		} else {
-			bookstore.get(isbn).setQuantity(quantity--);
+	// Get info about a book.
+	public Book getBook(int isbn) {
+		// Returns the book requested by the user
+		return store.get(isbn);
+	}
+
+	// Adds to the quantity of an existing book or add a new book the existing hash
+	// table.
+	public String donate(int isbn, Book newBook) {
+		String message = "Thanks for donating " + store.get(isbn).getTitle() + "!";
+		// If book already exists, add quantity of newBook to existing book's quantity
+		// at the isbn.
+		if (store.containsKey(isbn)) {
+			store.get(isbn).setQuantity(store.get(isbn).getQuantity() + newBook.getQuantity());
+			// Then increase amount of books in store by quantiy of books donated.
+			count = count + store.get(isbn).getQuantity();
+			return message;
 		}
+		// If book doesn't exist, add it to the store hash table.
+		store.put(isbn, newBook);
+		// Then increase amount of books in store by quantiy of books donated.
+		count = count + store.get(isbn).getQuantity();
+		return message;
 	}
 
-	// donate(isbn, book)
-	public void donate(Integer isbn, Book newBook) {
-		bookstore.put(isbn, newBook);
+	// Removes a book from the store hash table.
+	public String remove(int isbn) {
+		String message = " Thanks for buying " + store.get(isbn).getTitle() + "!";
+		// Remove the book.
+		store.remove(isbn);
+		// Decrease number of books in store by the quantity of books sold (will always
+		// be one for our store I believe).
+		count = count - store.get(isbn).getQuantity();
+		return message;
 	}
 
-	// steal method
-	// run clear() then return "we've been robbed of knowledge!")
+	// All of the books in the store get stolen.
 	public void steal() {
-		bookstore.clear();
-		System.out.println("We've been robbed of knowledge!");
+		// Clear the store, simulating a robbery
+		store.clear();
+		System.out.println("Oh no! The store has been robbed of knowledge!");
 	}
+
+	// Returns the number of books in the store, NOT the number of unique books (elements).
+	public int getCount() {
+		return count;
+	}
+
 }
