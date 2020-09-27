@@ -24,7 +24,7 @@ public class BookStore extends BookCollection {
 		store = new HashTableMap<Integer, Book>(20);
 		for (Book b : books) {
 			store.put(b.getIsbn(), b);
-			count++;
+			count = count + b.getQuantity();
 		}
 
 	}
@@ -49,10 +49,12 @@ public class BookStore extends BookCollection {
 	// table.
 	public String donate(int isbn, Book newBook) {
 		String message = "Thanks for donating " + store.get(isbn).getTitle() + "!";
+		int quantity = store.get(isbn).getQuantity();
 		// If book already exists, add quantity of newBook to existing book's quantity
 		// at the isbn.
 		if (store.containsKey(isbn)) {
-			store.get(isbn).setQuantity(store.get(isbn).getQuantity() + newBook.getQuantity());
+			// Set the new quantity by taking the old quantity and adding the new book's quantity.
+			store.get(isbn).setQuantity(quantity + newBook.getQuantity());
 			// Then increase amount of books in store by quantiy of books donated.
 			count = count + store.get(isbn).getQuantity();
 			return message;
@@ -60,18 +62,19 @@ public class BookStore extends BookCollection {
 		// If book doesn't exist, add it to the store hash table.
 		store.put(isbn, newBook);
 		// Then increase amount of books in store by quantiy of books donated.
-		count = count + store.get(isbn).getQuantity();
+		count = count + quantity;
 		return message;
 	}
 
 	// Removes a book from the store hash table.
 	public String remove(int isbn) {
 		String message = " Thanks for buying " + store.get(isbn).getTitle() + "!";
+		int quantity = store.get(isbn).getQuantity();
 		// Remove the book.
 		store.remove(isbn);
 		// Decrease number of books in store by the quantity of books sold (will always
 		// be one for our store I believe).
-		count = count - store.get(isbn).getQuantity();
+		count = count - quantity;
 		return message;
 	}
 
