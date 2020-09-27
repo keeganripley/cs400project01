@@ -53,7 +53,8 @@ public class BookStore extends BookCollection {
 		// If book already exists, add quantity of newBook to existing book's quantity
 		// at the isbn.
 		if (store.containsKey(isbn)) {
-			// Set the new quantity by taking the old quantity and adding the new book's quantity.
+			// Set the new quantity by taking the old quantity and adding the new book's
+			// quantity.
 			store.get(isbn).setQuantity(quantity + newBook.getQuantity());
 			// Then increase amount of books in store by quantiy of books donated.
 			count = count + store.get(isbn).getQuantity();
@@ -69,12 +70,18 @@ public class BookStore extends BookCollection {
 	// Removes a book from the store hash table.
 	public String remove(int isbn) {
 		String message = " Thanks for buying " + store.get(isbn).getTitle() + "!";
+		// Gets the quantity of the book at the parameter isbn.
 		int quantity = store.get(isbn).getQuantity();
-		// Remove the book.
-		store.remove(isbn);
-		// Decrease number of books in store by the quantity of books sold (will always
-		// be one for our store I believe).
-		count = count - quantity;
+		// If the quantity of the book is 1, then remove the book, other decrease
+		// quantiy by one.
+		if (quantity == 1) {
+			store.remove(isbn);
+		} else {
+			store.get(isbn).setQuantity(quantity--);
+		}
+		//
+		// Decrease number of books in store by one.
+		count--;
 		return message;
 	}
 
@@ -85,7 +92,8 @@ public class BookStore extends BookCollection {
 		System.out.println("Oh no! The store has been robbed of knowledge!");
 	}
 
-	// Returns the number of books in the store, NOT the number of unique books (elements).
+	// Returns the number of books in the store, NOT the number of unique books
+	// (elements).
 	public int getCount() {
 		return count;
 	}
