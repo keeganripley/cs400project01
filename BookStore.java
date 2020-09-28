@@ -34,7 +34,6 @@ public class BookStore extends BookCollection {
 
 	// Check to see if a book exists in the store hash table.
 	public boolean containsBook(int isbn) {
-
 		if (store.containsKey(isbn)) {
 			return true;
 		} else {
@@ -52,7 +51,7 @@ public class BookStore extends BookCollection {
 	// table.
 	public String donate(int isbn, Book newBook) {
 		String message = "Thanks for donating " + store.get(isbn).getTitle() + "!";
-		
+
 		// If book already exists, add quantity of newBook to existing book's quantity
 		// at the isbn.
 		if (store.containsKey(isbn)) {
@@ -69,21 +68,17 @@ public class BookStore extends BookCollection {
 		int quantity = store.get(isbn).getQuantity();
 		// Then increase amount of books in store by quantiy of books donated.
 		count = count + quantity;
-		return message;
+		return "Thanks for donating " + store.get(isbn).getTitle() + "!";
 		}
 	}
 
 	// Removes a book from the store hash table.
 	public String remove(int isbn) throws NoSuchElementException {
-		String message = " Thanks for buying " + store.get(isbn).getTitle() + "!";
 		try {
 			store.get(isbn);
 		} catch(Exception e) {
 			System.out.println("This book does not exist.");
 		}
-//		if(store.containsKey(isbn) == false) {
-//			throw new NoSuchElementException("This book does not exist.");
-//		}
 		// Gets the quantity of the book at the parameter isbn.
 		int quantity = store.get(isbn).getQuantity();
 		// If the quantity of the book is 1, then remove the book, other decrease
@@ -96,7 +91,7 @@ public class BookStore extends BookCollection {
 		//
 		// Decrease number of books in store by one.
 		count--;
-		return message;
+		return " Thanks for buying " + store.get(isbn).getTitle() + "!";
 	}
 
 	// All of the books in the store get stolen.
