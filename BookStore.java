@@ -12,11 +12,10 @@ public class BookStore extends BookCollection {
 	private int count; // Stores the number of books in the book store, NOT the number of elements in
 						// the hash table.
 
-	// Constructor which creates the stores hash table and adds initial books to the
+	// Constructor which creates the store's hash table and adds initial books to the
 	// store.
 	public BookStore(int capacity) {
 		super(20);
-
 		// Obtain initial books for the book store before user adds or removes books.
 		Book[] books = getInitialBooks();
 		// Initialize the store using global field with size 20 which is how many books
@@ -59,12 +58,13 @@ public class BookStore extends BookCollection {
 			// Then increase amount of books in store by quantiy of books donated.
 			count = count + store.get(isbn).getQuantity();
 			return message;
-		}
+		} else {
 		// If book doesn't exist, add it to the store hash table.
 		store.put(isbn, newBook);
 		// Then increase amount of books in store by quantiy of books donated.
 		count = count + quantity;
 		return message;
+		}
 	}
 
 	// Removes a book from the store hash table.
