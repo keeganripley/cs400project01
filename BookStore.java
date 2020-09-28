@@ -14,25 +14,43 @@ public class BookStore extends BookCollection {
 	private int count; // Stores the number of books in the book store, NOT the number of elements in
 						// the hash table.
 
-	// Constructor which creates the store's hash table and adds initial books to the
-	// store.
+	/**
+	 * 
+	 * @param capacity: max number of books in the bookstore
+	 * 
+	 *                  This constructor method is used to generate a book store,
+	 *                  which is a hash table. It will then add the books that will
+	 *                  be available upon the book store opening.
+	 */
 	public BookStore(int capacity) {
 		super(20);
+		count = 0;
 		// Obtain initial books for the book store before user adds or removes books.
 		Book[] books = getInitialBooks();
-		// Initialize the store using global field with size 20 which is how many books
-		// our store can hold.
+		// Initialize the book store.
 		store = new HashTableMap<Integer, Book>(20);
-		
-		for (Book b : books) {
-			// Get error because I call get before instantiating anything.
-			store.put(b.getIsbn(), b);
-			count = count + b.getQuantity();
+		// Iterate through the first 4 indices, adding the initial books.
+		for (int i = 0; i < books.length && books[i] != null; i++) {
+			count = count + books[i].getQuantity();
+			// If the book is already in the hash table, update quantity.
+			if (store.containsKey(books[i].getIsbn())) {
+				store.get(books[i].getIsbn())
+						.setQuantity(store.get(books[i].getIsbn()).getQuantity() + books[i].getQuantity());
+				// Otherwise the book does not exist yet, so put it into the book store.
+			} else
+				store.put(books[i].getIsbn(), books[i]);
+
 		}
 
 	}
 
-	// Check to see if a book exists in the store hash table.
+	/**
+	 * 
+	 * @param isbn: isbn of the book user is checking
+	 * @return true if book exists, false if it doesn't
+	 * 
+	 *         This method checks to see if a book exists in the book store.
+	 */
 	public boolean containsBook(int isbn) {
 		if (store.containsKey(isbn)) {
 			return true;
@@ -41,68 +59,83 @@ public class BookStore extends BookCollection {
 		}
 	}
 
-	// Get info about a book.
+	/**
+	 * 
+	 * @param isbn: isbn of the book user is checking
+	 * @return the book at the isbn given by user
+	 * 
+	 *         This method gets the book the user wants to look at.
+	 */
 	public Book getBook(int isbn) {
-		// Returns the book requested by the user
 		return store.get(isbn);
 	}
 
-	// Adds to the quantity of an existing book or add a new book the existing hash
-	// table.
-	public String donate(int isbn, Book newBook) {
-		String message = "Thanks for donating " + store.get(isbn).getTitle() + "!";
-
-		// If book already exists, add quantity of newBook to existing book's quantity
-		// at the isbn.
+	/**
+	 * 
+	 * @param isbn:    isbn of the book user is checking
+	 * @param newBook: the new book to be added
+	 * @return true if book successfully added, false if not added
+	 * 
+	 *         This method adds a book to the book store, as if a user donated it.
+	 */
+	public boolean donate(int isbn, Book newBook) {
+		// If the book already exists, update quantity.
 		if (store.containsKey(isbn)) {
-			int quantity = store.get(isbn).getQuantity();
-			// Set the new quantity by taking the old quantity and adding the new book's
-			// quantity.
-			store.get(isbn).setQuantity(quantity + newBook.getQuantity());
-			// Then increase amount of books in store by quantiy of books donated.
-			count = count + store.get(isbn).getQuantity();
-			return message;
-		} else {
-		// If book doesn't exist, add it to the store hash table.
-		store.put(isbn, newBook);
-		int quantity = store.get(isbn).getQuantity();
-		// Then increase amount of books in store by quantiy of books donated.
-		count = count + quantity;
-		return "Thanks for donating " + store.get(isbn).getTitle() + "!";
-		}
+			store.get(isbn).setQuantity(store.get(isbn).getQuantity() + newBook.getQuantity());
+			// Otherwise the book does not exist yet, so put it into the book store.
+		} else
+			store.put(isbn, newBook);
+
+		return (containsBook(isbn));
 	}
 
-	// Removes a book from the store hash table.
-	public String remove(int isbn) throws NoSuchElementException {
-		try {
-			store.get(isbn);
-		} catch(Exception e) {
-			System.out.println("This book does not exist.");
-		}
-		// Gets the quantity of the book at the parameter isbn.
-		int quantity = store.get(isbn).getQuantity();
-		// If the quantity of the book is 1, then remove the book, other decrease
-		// quantiy by one.
-		if (quantity == 1) {
-			store.remove(isbn);
-		} else {
-			store.get(isbn).setQuantity(quantity--);
-		}
-		//
-		// Decrease number of books in store by one.
-		count--;
-		return " Thanks for buying " + store.get(isbn).getTitle() + "!";
+	/**
+	 * 
+	 * @param isbn: isbn of the book user is checking
+	 * @return either the title of the book or a message saying it does not exist.
+	 * @throws NoSuchElementException
+	 * 
+	 *                                This method removes a book that has been
+	 *                                purchased by the user.
+	 */
+	public String remove(int isbn) {
+		// If the book exists, remove it.
+		if (containsBook(isbn)) {
+			// Create a message to be returned when book is purchased.
+			Book selling = store.get(isbn);
+			String confirmSale = "Book bought: " + selling.getTitle();
+
+			// If quantity is below 2, remove the book from the bookstore.
+			if (store.get(isbn).getQuantity() < 2) {
+				store.remove(isbn);
+			}
+			// Otherwise decrease quantity of the book by one.
+			else {
+				store.get(isbn).setQuantity(store.get(isbn).getQuantity() - 1);
+				count--;
+			}
+
+			return confirmSale;
+		// Otherwise tell user book does not exist.
+		} else
+			return "I'm sorry, we do not have this book.";
 	}
 
-	// All of the books in the store get stolen.
+	/**
+	 * This method removes all books from the book store, simulating being robbed.
+	 */
 	public void steal() {
-		// Clear the store, simulating a robbery
 		store.clear();
 		System.out.println("Oh no! The store has been robbed of knowledge!");
 	}
 
-	// Returns the number of books in the store, NOT the number of unique books
-	// (elements).
+	/**
+	 * 
+	 * @return total number of books in the book store, NOT the number of elements
+	 *         in the hash table.
+	 *         
+	 *         This method is a getter for count.
+	 */
 	public int getCount() {
 		return count;
 	}
