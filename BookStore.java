@@ -22,10 +22,11 @@ public class BookStore extends BookCollection {
 	 *                  which is a hash table. It will then add the books that will
 	 *                  be available upon the book store opening.
 	 */
-	public BookStore(int capacity) {
+	public BookStore(int capacity) throws FileNotFoundException{
 		super(20);
 		count = 0;
 		// Obtain initial books for the book store before user adds or removes books.
+		addInitialBooksToTable();
 		Book[] books = getInitialBooks();
 		// Initialize the book store.
 		store = new HashTableMap<Integer, Book>(20);
